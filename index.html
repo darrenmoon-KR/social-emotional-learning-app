@@ -946,7 +946,7 @@
             }
         }
 
-        // 앱 초기화
+        // 앱 초기화 (접속 코드 표시 추가)
         function initApp() {
             loadAppState();
             handleURLHash();
@@ -956,6 +956,11 @@
                 appState.accessCode = generateAccessCode();
                 saveAppState();
             }
+            
+            // 디버그용 콘솔 출력
+            console.log('앱 초기화 완료');
+            console.log('현재 접속 코드:', appState.accessCode);
+            console.log('QRCode 라이브러리:', typeof QRCode !== 'undefined' ? '로드됨' : '로드 안됨');
         }
 
         // 페이지 로드 시 초기화
