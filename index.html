@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회정서 학습 도우미</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2C5F5D;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            color: #4ECDC4;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .login-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #4ECDC4;
+            color: white;
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .access-code-display {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .access-code {
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .qr-container {
+            margin: 20px 0;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .btn {
+            background: #4ECDC4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn:hover {
+            background: #44A08D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #4ECDC4;
+            outline: none;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+        }
+
+        .keyword-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .wordcloud-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .word-item {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            border-radius: 25px;
+            margin: 5px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .word-item:hover {
+            transform: scale(1.05);
+        }
+
+        .memo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .memo-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .memo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #4ECDC4;
+        }
+
+        .memo-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .memo-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .like-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .like-btn.liked {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .admin-controls {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4ECDC4;
+        }
+
+        .fullscreen-presentation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #2C5F5D, #4ECDC4);
+            z-index: 9999;
+            display: none;
+            padding: 50px;
+        }
+
+        .fullscreen-wordcloud {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .fullscreen-word {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            border-radius: 30px;
+            margin: 10px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-fullscreen {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2C5F5D;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .keyword-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .memo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .access-code {
+                font-size: 2rem;
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌳 사회정서 학습 도우미</h1>
+            <p class="subtitle">함께 성장하는 우리들의 마음</p>
+        </div>
+
+        <!-- 로그인 화면 -->
+        <div id="loginSection" class="login-section">
+            <h2 style="color: #2C5F5D; margin-bottom: 30px;">접속 방법을 선택하세요</h2>
+            
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn" onclick="showTeacherLogin()">교사 로그인</button>
+                <button class="btn" onclick="showStudentLogin()">학생 접속</button>
+            </div>
+
+            <!-- 교사 로그인 -->
+            <div id="teacherLogin" class="hidden" style="margin-top: 30px;">
+                <h3 style="color: #2C5F5D; margin-bottom: 20px;">교사 로그인</h3>
+                <div class="input-group">
+                    <input type="password" id="teacherPassword" placeholder="관리자 비밀번호" onkeypress="handleTeacherKeyPress(event)">
+                </div>
+                <button class="btn" onclick="teacherLogin()">로그인</button>
+                <button class="btn" onclick="showMainLogin()" style="background: #6c757d;">취소</button>
+            </div>
+
+            <!-- 학생 로그인 -->
+            <div id="studentLogin" class="hidden" style="margin-top: 30px;">
+                <h3 style="color: #2C5F5D; margin-bottom: 20px;">접속 코드 입력</h3>
+                <div class="input-group">
+                    <input type="text" id="accessCodeInput" placeholder="접속 코드를 입력하세요" onkeypress="handleStudentKeyPress(event)" style="text-align: center; font-size: 1.5rem; letter-spacing: 2px;">
+                </div>
+                <button class="btn" onclick="studentLogin()">접속하기</button>
+                <button class="btn" onclick="showMainLogin()" style="background: #6c757d;">취소</button>
+            </div>
+        </div>
+
+        <!-- 메인 앱 화면 -->
+        <div id="mainApp" class="hidden">
+            <!-- 교사용 컨트롤 패널 -->
+            <div id="adminControls" class="admin-controls hidden">
+                <h3 style="color: #2C5F5D; margin-bottom: 15px;">🔧 교사 관리 패널</h3>
+                <div class="access-code-display">
+                    <div style="font-size: 1.2rem; margin-bottom: 10px;">현재 접속 코드</div>
+                    <div class="access-code" id="currentAccessCode">ABC123</div>
+                    <div class="qr-container">
+                        <div class="qr-code" id="qrCode"></div>
+                        <div>
+                            <button class="btn" onclick="enlargeQR()">QR코드 확대</button>
+                            <button class="btn" onclick="refreshAccessCode()">새 코드 생성</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="toggleFullscreenPresentation()">워드클라우드 전체화면</button>
+                <button class="btn btn-danger" onclick="resetApp()">앱 초기화</button>
+                <button class="btn" onclick="logout()" style="background: #6c757d;">로그아웃</button>
+            </div>
+
+            <div class="main-content">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('wordcloud')">📊 워드클라우드</button>
+                    <button class="tab" onclick="showTab('memo')">💭 익명 메모</button>
+                </div>
+
+                <!-- 워드클라우드 탭 -->
+                <div id="wordcloudTab" class="tab-content active">
+                    <h3 style="color: #2C5F5D; margin-bottom: 20px;">키워드를 입력해주세요 (최대 3개)</h3>
+                    <div class="keyword-inputs">
+                        <input type="text" id="keyword1" placeholder="첫 번째 키워드" maxlength="20">
+                        <input type="text" id="keyword2" placeholder="두 번째 키워드" maxlength="20">
+                        <input type="text" id="keyword3" placeholder="세 번째 키워드" maxlength="20">
+                    </div>
+                    <button class="btn" onclick="submitKeywords()">키워드 제출</button>
+                    
+                    <div class="wordcloud-container" id="wordcloudDisplay">
+                        <p style="color: #666;">키워드가 제출되면 여기에 워드클라우드가 표시됩니다.</p>
+                    </div>
+                </div>
+
+                <!-- 메모 탭 -->
+                <div id="memoTab" class="tab-content">
+                    <h3 style="color: #2C5F5D; margin-bottom: 20px;">익명으로 메모를 남겨주세요</h3>
+                    <div class="input-group">
+                        <textarea id="memoInput" placeholder="생각을 자유롭게 적어보세요..." style="width: 100%; height: 100px; resize: vertical; border: 2px solid #e0e0e0; border-radius: 10px; padding: 15px; font-size: 1rem;"></textarea>
+                    </div>
+                    <button class="btn" onclick="submitMemo()">메모 남기기</button>
+                    
+                    <div class="memo-grid" id="memoDisplay">
+                        <!-- 메모들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전체화면 프레젠테이션 -->
+    <div id="fullscreenPresentation" class="fullscreen-presentation">
+        <button class="close-fullscreen" onclick="exitFullscreen()">✕ 닫기 (ESC)</button>
+        <div class="fullscreen-wordcloud" id="fullscreenWordcloud">
+            <p style="color: #666; font-size: 1.5rem;">워드클라우드 데이터가 없습니다.</p>
+        </div>
+    </div>
+
+    <!-- QR코드 확대 모달 -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">QR코드로 접속하기</h3>
+            <div id="enlargedQR"></div>
+            <button class="btn" onclick="closeQRModal()" style="margin-top: 20px;">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        // 앱 상태 관리
+        let appState = {
+            isTeacher: false,
+            accessCode: '',
+            keywords: {},
+            memos: [],
+            userKeywords: [],
+            likedMemos: new Set(),
+            userSubmitted: false
+        };
+
+        // 로컬 스토리지에서 데이터 로드
+        function loadAppState() {
+            const saved = localStorage.getItem('socialEmotionalApp');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                appState.keywords = parsed.keywords || {};
+                appState.memos = parsed.memos || [];
+                appState.accessCode = parsed.accessCode || generateAccessCode();
+            } else {
+                appState.accessCode = generateAccessCode();
+            }
+        }
+
+        // 로컬 스토리지에 데이터 저장
+        function saveAppState() {
+            const dataToSave = {
+                keywords: appState.keywords,
+                memos: appState.memos,
+                accessCode: appState.accessCode
+            };
+            localStorage.setItem('socialEmotionalApp', JSON.stringify(dataToSave));
+        }
+
+        // 접속 코드 생성
+        function generateAccessCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // QR 코드 생성
+        function generateQR(code) {
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+            
+            const currentURL = window.location.href.split('#')[0];
+            const qrData = `${currentURL}#student=${code}`;
+            
+            QRCode.toCanvas(qrContainer, qrData, {
+                width: 200,
+                height: 200,
+                colorDark: '#2C5F5D',
+                colorLight: '#FFFFFF',
+                margin: 2
+            });
+        }
+
+        // 로그인 화면 표시
+        function showMainLogin() {
+            document.getElementById('teacherLogin').classList.add('hidden');
+            document.getElementById('studentLogin').classList.add('hidden');
+        }
+
+        function showTeacherLogin() {
+            document.getElementById('teacherLogin').classList.remove('hidden');
+            document.getElementById('studentLogin').classList.add('hidden');
+            document.getElementById('teacherPassword').focus();
+        }
+
+        function showStudentLogin() {
+            document.getElementById('studentLogin').classList.remove('hidden');
+            document.getElementById('teacherLogin').classList.add('hidden');
+            document.getElementById('accessCodeInput').focus();
+        }
+
+        // 교사 비밀번호 설정 (여기서 변경하세요)
+        const TEACHER_PASSWORD = 'teacher123';  // ← 이 부분을 원하는 비밀번호로 변경하세요
+
+        // 교사 로그인
+        function teacherLogin() {
+            const password = document.getElementById('teacherPassword').value;
+            if (password === TEACHER_PASSWORD) {
+                appState.isTeacher = true;
+                showMainApp();
+                document.getElementById('adminControls').classList.remove('hidden');
+                document.getElementById('currentAccessCode').textContent = appState.accessCode;
+                generateQR(appState.accessCode);
+            } else {
+                alert('올바르지 않은 비밀번호입니다.');
+            }
+        }
+
+        // 학생 로그인
+        function studentLogin() {
+            const inputCode = document.getElementById('accessCodeInput').value.toUpperCase();
+            if (inputCode === appState.accessCode) {
+                appState.isTeacher = false;
+                showMainApp();
+                document.getElementById('adminControls').classList.add('hidden');
+            } else {
+                alert('올바르지 않은 접속 코드입니다.');
+            }
+        }
+
+        // 키보드 이벤트 처리
+        function handleTeacherKeyPress(event) {
+            if (event.key === 'Enter') {
+                teacherLogin();
+            }
+        }
+
+        function handleStudentKeyPress(event) {
+            if (event.key === 'Enter') {
+                studentLogin();
+            }
+        }
+
+        // 메인 앱 화면 표시
+        function showMainApp() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            refreshWordcloud();
+            refreshMemos();
+        }
+
+        // 로그아웃
+        function logout() {
+            appState.isTeacher = false;
+            appState.userKeywords = [];
+            appState.userSubmitted = false;
+            appState.likedMemos.clear();
+            
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('teacherPassword').value = '';
+            document.getElementById('accessCodeInput').value = '';
+            
+            // 키워드 입력 필드 초기화
+            document.getElementById('keyword1').value = '';
+            document.getElementById('keyword2').value = '';
+            document.getElementById('keyword3').value = '';
+            document.getElementById('memoInput').value = '';
+            
+            showMainLogin();
+        }
+
+        // 탭 전환
+        function showTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // 키워드 제출
+        function submitKeywords() {
+            if (appState.userSubmitted && !appState.isTeacher) {
+                alert('이미 키워드를 제출하셨습니다.');
+                return;
+            }
+
+            const keyword1 = document.getElementById('keyword1').value.trim();
+            const keyword2 = document.getElementById('keyword2').value.trim();
+            const keyword3 = document.getElementById('keyword3').value.trim();
+            
+            const keywords = [keyword1, keyword2, keyword3].filter(k => k !== '');
+            
+            if (keywords.length === 0) {
+                alert('최소 하나의 키워드를 입력해주세요.');
+                return;
+            }
+
+            // 기존 사용자 키워드 제거
+            appState.userKeywords.forEach(keyword => {
+                if (appState.keywords[keyword]) {
+                    appState.keywords[keyword]--;
+                    if (appState.keywords[keyword] <= 0) {
+                        delete appState.keywords[keyword];
+                    }
+                }
+            });
+
+            // 새 키워드 추가
+            appState.userKeywords = keywords;
+            keywords.forEach(keyword => {
+                appState.keywords[keyword] = (appState.keywords[keyword] || 0) + 1;
+            });
+
+            appState.userSubmitted = true;
+            saveAppState();
+            refreshWordcloud();
+            
+            alert('키워드가 제출되었습니다!');
+        }
+
+        // 워드클라우드 새로고침
+        function refreshWordcloud() {
+            const container = document.getElementById('wordcloudDisplay');
+            container.innerHTML = '';
+            
+            if (Object.keys(appState.keywords).length === 0) {
+                container.innerHTML = '<p style="color: #666;">아직 제출된 키워드가 없습니다.</p>';
+                return;
+            }
+
+            const maxCount = Math.max(...Object.values(appState.keywords));
+            
+            Object.entries(appState.keywords).forEach(([word, count]) => {
+                const wordElement = document.createElement('div');
+                wordElement.className = 'word-item';
+                wordElement.textContent = `${word} (${count})`;
+                
+                // 빈도에 따른 크기 조절
+                const fontSize = Math.max(0.8, Math.min(2, count / maxCount * 1.5));
+                wordElement.style.fontSize = fontSize + 'rem';
+                
+                container.appendChild(wordElement);
+            });
+        }
+
+        // 메모 제출
+        function submitMemo() {
+            const memoText = document.getElementById('memoInput').value.trim();
+            
+            if (memoText === '') {
+                alert('메모를 입력해주세요.');
+                return;
+            }
+
+            const memo = {
+                id: Date.now(),
+                text: memoText,
+                likes: 0,
+                timestamp: new Date().toLocaleString()
+            };
+
+            appState.memos.unshift(memo);
+            document.getElementById('memoInput').value = '';
+            
+            saveAppState();
+            refreshMemos();
+            
+            alert('메모가 등록되었습니다!');
+        }
+
+        // 메모 새로고침
+        function refreshMemos() {
+            const container = document.getElementById('memoDisplay');
+            container.innerHTML = '';
+            
+            if (appState.memos.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; grid-column: 1 / -1;">아직 등록된 메모가 없습니다.</p>';
+                return;
+            }
+
+            appState.memos.forEach(memo => {
+                const memoCard = document.createElement('div');
+                memoCard.className = 'memo-card';
+                
+                const isLiked = appState.likedMemos.has(memo.id);
+                
+                memoCard.innerHTML = `
+                    <div class="memo-content">${memo.text}</div>
+                    <div class="memo-actions">
+                        <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${memo.id})">
+                            ❤️ ${memo.likes}
+                        </button>
+                        ${appState.isTeacher ? `<button class="delete-btn" onclick="deleteMemo(${memo.id})">삭제</button>` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(memoCard);
+            });
+        }
+
+        // 좋아요 토글
+        function toggleLike(memoId) {
+            const memo = appState.memos.find(m => m.id === memoId);
+            if (!memo) return;
+
+            if (appState.likedMemos.has(memoId)) {
+                // 좋아요 취소
+                memo.likes--;
+                appState.likedMemos.delete(memoId);
+            } else {
+                // 좋아요 추가
+                memo.likes++;
+                appState.likedMemos.add(memoId);
+            }
+
+            saveAppState();
+            refreshMemos();
+        }
+
+        // 메모 삭제 (교사만)
+        function deleteMemo(memoId) {
+            if (!appState.isTeacher) return;
+            
+            if (confirm('이 메모를 삭제하시겠습니까?')) {
+                appState.memos = appState.memos.filter(m => m.id !== memoId);
+                appState.likedMemos.delete(memoId);
+                saveAppState();
+                refreshMemos();
+            }
+        }
+
+        // 접속 코드 새로고침
+        function refreshAccessCode() {
+            if (confirm('새로운 접속 코드를 생성하면 기존 데이터가 모두 초기화됩니다. 계속하시겠습니까?')) {
+                appState.accessCode = generateAccessCode();
+                appState.keywords = {};
+                appState.memos = [];
+                appState.userKeywords = [];
+                appState.userSubmitted = false;
+                appState.likedMemos.clear();
+                
+                document.getElementById('currentAccessCode').textContent = appState.accessCode;
+                generateQR(appState.accessCode);
+                
+                saveAppState();
+                refreshWordcloud();
+                refreshMemos();
+                
+                alert('새로운 접속 코드가 생성되었습니다!');
+            }
+        }
+
+        // 앱 초기화
+        function resetApp() {
+            if (confirm('앱을 초기화하면 모든 데이터가 삭제됩니다. 계속하시겠습니까?')) {
+                localStorage.removeItem('socialEmotionalApp');
+                appState.keywords = {};
+                appState.memos = [];
+                appState.userKeywords = [];
+                appState.userSubmitted = false;
+                appState.likedMemos.clear();
+                
+                refreshWordcloud();
+                refreshMemos();
+                
+                alert('앱이 초기화되었습니다.');
+            }
+        }
+
+        // 전체화면 프레젠테이션
+        function toggleFullscreenPresentation() {
+            const presentation = document.getElementById('fullscreenPresentation');
+            const wordcloudContainer = document.getElementById('fullscreenWordcloud');
+            
+            // 워드클라우드 데이터 생성
+            wordcloudContainer.innerHTML = '';
+            
+            if (Object.keys(appState.keywords).length === 0) {
+                wordcloudContainer.innerHTML = '<p style="color: #666; font-size: 2rem;">아직 제출된 키워드가 없습니다.</p>';
+            } else {
+                const maxCount = Math.max(...Object.values(appState.keywords));
+                
+                Object.entries(appState.keywords).forEach(([word, count]) => {
+                    const wordElement = document.createElement('div');
+                    wordElement.className = 'fullscreen-word';
+                    wordElement.textContent = `${word} (${count})`;
+                    
+                    // 전체화면용 크기 조절
+                    const fontSize = Math.max(1.5, Math.min(4, count / maxCount * 3));
+                    wordElement.style.fontSize = fontSize + 'rem';
+                    
+                    wordcloudContainer.appendChild(wordElement);
+                });
+            }
+            
+            presentation.style.display = 'flex';
+            
+            // 전체화면 API 사용
+            if (presentation.requestFullscreen) {
+                presentation.requestFullscreen();
+            } else if (presentation.webkitRequestFullscreen) {
+                presentation.webkitRequestFullscreen();
+            } else if (presentation.msRequestFullscreen) {
+                presentation.msRequestFullscreen();
+            }
+        }
+
+        // 전체화면 종료
+        function exitFullscreen() {
+            document.getElementById('fullscreenPresentation').style.display = 'none';
+            
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // QR코드 확대
+        function enlargeQR() {
+            const modal = document.getElementById('qrModal');
+            const enlargedContainer = document.getElementById('enlargedQR');
+            
+            enlargedContainer.innerHTML = '';
+            
+            const currentURL = window.location.href.split('#')[0];
+            const qrData = `${currentURL}#student=${appState.accessCode}`;
+            
+            QRCode.toCanvas(enlargedContainer, qrData, {
+                width: 300,
+                height: 300,
+                colorDark: '#2C5F5D',
+                colorLight: '#FFFFFF',
+                margin: 3
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        // QR코드 모달 닫기
+        function closeQRModal() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+        // ESC 키로 전체화면 종료
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                exitFullscreen();
+                closeQRModal();
+            }
+        });
+
+        // 전체화면 변경 이벤트 감지
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement) {
+                document.getElementById('fullscreenPresentation').style.display = 'none';
+            }
+        });
+
+        // URL 해시로 자동 로그인 처리
+        function handleURLHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#student=')) {
+                const code = hash.substring(9);
+                document.getElementById('accessCodeInput').value = code;
+                showStudentLogin();
+            }
+        }
+
+        // 앱 초기화
+        function initApp() {
+            loadAppState();
+            handleURLHash();
+            
+            // 접속 코드가 없으면 새로 생성
+            if (!appState.accessCode) {
+                appState.accessCode = generateAccessCode();
+                saveAppState();
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', initApp);
+        
+        // 브라우저 뒤로가기/앞으로가기 처리
+        window.addEventListener('hashchange', handleURLHash);
+    </script>
+</body>
+</html>
